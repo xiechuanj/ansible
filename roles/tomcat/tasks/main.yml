@@ -1,0 +1,18 @@
+- name: install java
+  yum: name=java-1.8.0-openjdk state=present
+- name: group
+  group: name=tomcat
+- name: user
+  user: name=tomcat group=tomcat home=/usr/tomcat
+- name: copy tomcat_tar_gz
+  copy: src=apache-tomcat-8.5.27.tar.gz dest=/tmp/apache-tomcat-8.5.27.tar.gz
+- name: Extract archive
+  command: /bin/tar xf /tmp/apache-tomcat-8.5.27.tar.gz -C /opt/
+- name: Symlink install directory
+  file: src=/opt/apache-tomcat-8.5.27 dest=/usr/share/tomcat state=link
+- name: Change ownership of Tomcat installation
+  file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes
+- name: Configure Tomcat users
+  template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+- name: Start Tomcat
+  shell: nohup /usr/share/tomcat/bin/startup.sh
